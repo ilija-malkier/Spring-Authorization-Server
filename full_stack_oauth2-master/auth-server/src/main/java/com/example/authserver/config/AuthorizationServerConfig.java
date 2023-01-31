@@ -9,6 +9,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
@@ -19,6 +20,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -40,13 +42,18 @@ public class AuthorizationServerConfig {
   // http://localhost:8080/oauth2/token?client_id=client&redirect_uri=http://127.0.0.1:3000/authorized&grant_type=authorization_code&code=MJ5WmUiOAnVFHi9BS6PS5dqHvO56fHkQVqR8gUg-yOmpgohvsFmH4xU6lFcwwDN0nkAcYdldOROnhAhf0cDROu-PgSup94fx28geM4p08TSEZ_c9c9vkL_yy34WBfnyY&code_verifier=qPsH306-ZDDaOE8DFzVn05TkN3ZZoVmI_6x4LsVglQI
 
   private final CORSCustomizer corsCustomizer;
+//  private JpaCustomRegistgeredClientRepository jpaCustomRegistgeredClientRepository;
 
   @Bean
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain securityASFilterChain(HttpSecurity http) throws Exception {
     OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+//    OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+//            new OAuth2AuthorizationServerConfigurer();
+//    http.apply(authorizationServerConfigurer);
 
-   // http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+
+    http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
     //if user is not auth redirect it to login page
     http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
         .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
@@ -82,6 +89,7 @@ public class AuthorizationServerConfig {
             .refreshTokenTimeToLive(Duration.ofHours(10))
             .build())
         .build();
+
 
     return new InMemoryRegisteredClientRepository(registeredClient);
   }
