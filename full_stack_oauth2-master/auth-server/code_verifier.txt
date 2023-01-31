@@ -1,0 +1,9 @@
+import java.security.SecureRandom;
+import java.util.Base64;
+
+    SecureRandom secureRandom=new SecureRandom();
+byte[] arr=new byte[32];
+secureRandom.nextBytes(arr);
+
+String codeVerified= Base64.getUrlEncoder().withoutPadding().encodeToString(arr);
+System.out.append(codeVerified);

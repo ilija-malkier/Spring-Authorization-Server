@@ -1,0 +1,13 @@
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+    MessageDigest messageDigest; {
+    try {
+        messageDigest = MessageDigest.getInstance("SHA-256");
+       byte[] arr= messageDigest.digest("MUQt-CeLhkHyFpVDF9oFbtIFhvQ7fLhr7gXDgm-t68M".getBytes());
+        String codeChallenge= Base64.getEncoder().withoutPadding().encodeToString(arr);
+        System.out.println(codeChallenge);
+    } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException(e);
+    }
+}
