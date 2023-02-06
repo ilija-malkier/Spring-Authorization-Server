@@ -79,20 +79,21 @@ public class AuthorizationServerConfig {
     // sa login with google,ovo registedClientRepository je u stvari skup user-a koji su registrovani na app i oni mogu da daju consent .Dosta je slicno
     //kao user details service ali samo sto ne radi sa user-om nego sa client-om imarazlike ovde
 
-  @Bean
-  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-    RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-            //username
-            .clientId("client")
-            //password
-            .clientSecret("secret")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-        .redirectUri("http://127.0.0.1:3000/authorized")
-        .scope(OidcScopes.OPENID)
-        .clientSettings(ClientSettings.builder()
-            .requireAuthorizationConsent(true)
+//  @Bean
+//  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+//    RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//            //username
+//            .clientId("client")
+//            //password
+//            .clientSecret("secret")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//        .redirectUri("http://127.0.0.1:3000/authorized")
+//        .scope(OidcScopes.OPENID)
+//        .clientSettings(ClientSettings.builder()
+//            .requireAuthorizationConsent(true)
+
                 //now need PKCE
                 //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
                 // ne moramo client secrete da saljemo sto je vise secure
@@ -156,41 +157,41 @@ public class AuthorizationServerConfig {
 //
 //    return jdbcRegisteredClientRepository;
 //  }
-    @Bean
-    @Primary
-    public RegisteredClientRepository registeredClientRepositoryJDBC(JdbcTemplate jdbcTemplate) {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                //username
-                .clientId("client")
-                //password
-                .clientSecret("secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:3000/authorized")
-                .scope(OidcScopes.OPENID)
-                .clientSettings(ClientSettings.builder()
-                        .requireAuthorizationConsent(true)
-                        //now need PKCE
-                        //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
-                        // ne moramo client secrete da saljemo sto je vise secure
+//    @Bean
+//    @Primary
+//    public RegisteredClientRepository registeredClientRepositoryJDBC(JdbcTemplate jdbcTemplate) {
+//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                //username
+//                .clientId("client")
+//                //password
+//                .clientSecret("secret")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//                .redirectUri("http://127.0.0.1:3000/authorized")
+//                .scope(OidcScopes.OPENID)
+//                .clientSettings(ClientSettings.builder()
+//                        .requireAuthorizationConsent(true)
+//                        //now need PKCE
+//                        //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
+//                        // ne moramo client secrete da saljemo sto je vise secure
+////
+////                  .requireProofKey(true)
+//                        .build())
+//                .tokenSettings(TokenSettings.builder()
+//                        .refreshTokenTimeToLive(Duration.ofHours(10))
+//                        .build())
+//                .build();
 //
-//                  .requireProofKey(true)
-                        .build())
-                .tokenSettings(TokenSettings.builder()
-                        .refreshTokenTimeToLive(Duration.ofHours(10))
-                        .build())
-                .build();
-
+////
+////    return new InMemoryRegisteredClientRepository(registeredClient);
 //
-//    return new InMemoryRegisteredClientRepository(registeredClient);
-
-    JdbcRegisteredClientRepository jdbcRegisteredClientRepository=new JdbcRegisteredClientRepository(jdbcTemplate);
-    jdbcRegisteredClientRepository.save(registeredClient);
-    return jdbcRegisteredClientRepository;
-  }
-        return jpaCustomRegistgeredClientRepository;
-    }
+//    JdbcRegisteredClientRepository jdbcRegisteredClientRepository=new JdbcRegisteredClientRepository(jdbcTemplate);
+//    jdbcRegisteredClientRepository.save(registeredClient);
+//    return jdbcRegisteredClientRepository;
+//  }
+//        return jpaCustomRegistgeredClientRepository;
+//    }
 
 
   //define endpoints for oid and oauth2 endpoints,default now
@@ -214,4 +215,6 @@ public class AuthorizationServerConfig {
   public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
     return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
   }
+
+
 }
