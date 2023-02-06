@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -66,7 +67,7 @@ public class AuthorizationServerConfig {
   //kao user details service ali samo sto ne radi sa user-om nego sa client-om imarazlike ovde
 
   @Bean
-  public RegisteredClientRepository registeredClientRepository() {
+  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
     RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
             //username
             .clientId("client")
@@ -90,8 +91,12 @@ public class AuthorizationServerConfig {
             .build())
         .build();
 
+//
+//    return new InMemoryRegisteredClientRepository(registeredClient);
 
-    return new InMemoryRegisteredClientRepository(registeredClient);
+    JdbcRegisteredClientRepository jdbcRegisteredClientRepository=new JdbcRegisteredClientRepository(jdbcTemplate);
+    jdbcRegisteredClientRepository.save(registeredClient);
+    return jdbcRegisteredClientRepository;
   }
 
 
