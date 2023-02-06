@@ -22,15 +22,15 @@ public class WebSecurityConfig {
     corsCustomizer.corsCustomizer(http);
     return http.formLogin()
             .and()
-          .authorizeHttpRequests()
-            .anyRequest().authenticated()
-          .and().build();
+            .authorizeHttpRequests(x -> x.requestMatchers("/error").permitAll())
+            .authorizeHttpRequests().anyRequest().fullyAuthenticated()
+
+            .and().build();
   }
 
   @Bean
   public UserDetailsService userDetailsService() {
     var u1 = User.withUsername("bill").password("12345").authorities("read").build();
-
     var uds = new InMemoryUserDetailsManager();
     uds.createUser(u1);
     return uds;

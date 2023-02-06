@@ -1,6 +1,7 @@
 package com.example.authserver.config;
 
 import com.example.authserver.config.keys.JwksKeys;
+import com.example.authserver.repository.JpaCustomRegistgeredClientRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -42,29 +43,41 @@ public class AuthorizationServerConfig {
   // http://localhost:8080/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://127.0.0.1:3000/authorized&code_challenge=QYPAZ5NU8yvtlQ9erXrUYR-T5AGCjCF47vN-KsaI2A8&code_challenge_method=S256
   // http://localhost:8080/oauth2/token?client_id=client&redirect_uri=http://127.0.0.1:3000/authorized&grant_type=authorization_code&code=MJ5WmUiOAnVFHi9BS6PS5dqHvO56fHkQVqR8gUg-yOmpgohvsFmH4xU6lFcwwDN0nkAcYdldOROnhAhf0cDROu-PgSup94fx28geM4p08TSEZ_c9c9vkL_yy34WBfnyY&code_verifier=qPsH306-ZDDaOE8DFzVn05TkN3ZZoVmI_6x4LsVglQI
 
-  private final CORSCustomizer corsCustomizer;
-//  private JpaCustomRegistgeredClientRepository jpaCustomRegistgeredClientRepository;
+    private final CORSCustomizer corsCustomizer;
+    private JpaCustomRegistgeredClientRepository jpaCustomRegistgeredClientRepository;
 
   @Bean
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain securityASFilterChain(HttpSecurity http) throws Exception {
-    OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+      OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 //    OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
 //            new OAuth2AuthorizationServerConfigurer();
-//    http.apply(authorizationServerConfigurer);
+//      http.apply(authorizationServerConfigurer);
+//
+//      authorizationServerConfigurer.authorizationEndpoint(authorizationServerEndpointConfigurer->{
+//        authorizationServerEndpointConfigurer
+//                .authorizationRequestConverter(new BasicAuthenticationConverter())
+//                .consentPage("http://127.0.0.1:3000/consent")
+////                .authorizationResponseHandler("custom")
+//        ;
+//    });
+//
 
 
-    http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
-    //if user is not auth redirect it to login page
-    http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-        .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
-    corsCustomizer.corsCustomizer(http);
-    return http.formLogin().and().build();
+// Enable OpenID Connect 1.0
+      http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+      //if user is not auth redirect it to login page
+      http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+              // Accept access tokens for User Info and/or Client Registration
+              .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+      corsCustomizer.corsCustomizer(http);
+
+      return http.formLogin().and().build();
   }
 
-  //cela poenta Authorization servera je ako neko 3th party zatrazi neke personal info iz nase app da mu mi kao priredimo postupak kao sto ima google
-  // sa login with google,ovo registedClientRepository je u stvari skup user-a koji su registrovani na app i oni mogu da daju consent .Dosta je slicno
-  //kao user details service ali samo sto ne radi sa user-om nego sa client-om imarazlike ovde
+    //cela poenta Authorization servera je ako neko 3th party zatrazi neke personal info iz nase app da mu mi kao priredimo postupak kao sto ima google
+    // sa login with google,ovo registedClientRepository je u stvari skup user-a koji su registrovani na app i oni mogu da daju consent .Dosta je slicno
+    //kao user details service ali samo sto ne radi sa user-om nego sa client-om imarazlike ovde
 
   @Bean
   public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
@@ -83,13 +96,91 @@ public class AuthorizationServerConfig {
                 //now need PKCE
                 //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
                 // ne moramo client secrete da saljemo sto je vise secure
+//  @Bean
+//  public RegisteredClientRepository registeredClientRepository() {
+//    RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//            //username
+//            .clientId("client")
+//            //password
+//            .clientSecret("secret")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//        .redirectUri("http://127.0.0.1:3000/authorized")
+//        .scope(OidcScopes.OPENID)
+//        .clientSettings(ClientSettings.builder()
+//            .requireAuthorizationConsent(true)
+//                //now need PKCE
+//                //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
+//                // ne moramo client secrete da saljemo sto je vise secure
+////
+////                  .requireProofKey(true)
+//                .build())
+//        .tokenSettings(TokenSettings.builder()
+//            .refreshTokenTimeToLive(Duration.ofHours(10))
+//            .build())
+//        .build();
+//
+//
+//    return new InMemoryRegisteredClientRepository(registeredClient);
+//  }
+
+    //default jdbc
+//  @Bean
+//  public RegisteredClientRepository registeredClientRepositoryJDBC(JdbcTemplate jdbcTemplate) {
+//    RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//            //username
+//            .clientId("client")
+//            //password
+//            .clientSecret("secret")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//        .redirectUri("http://127.0.0.1:3000/authorized")
+//        .scope(OidcScopes.OPENID)
+//        .clientSettings(ClientSettings.builder()
+//            .requireAuthorizationConsent(true)
+//                //now need PKCE
+//                //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
+//                // ne moramo client secrete da saljemo sto je vise secure
+////
+////                  .requireProofKey(true)
+//                .build())
+//        .tokenSettings(TokenSettings.builder()
+//            .refreshTokenTimeToLive(Duration.ofHours(10))
+//            .build())
+//        .build();
+//    JdbcRegisteredClientRepository jdbcRegisteredClientRepository=new JdbcRegisteredClientRepository(jdbcTemplate);
+//    jdbcRegisteredClientRepository.save(registeredClient);
+//
+//
+//    return jdbcRegisteredClientRepository;
+//  }
+    @Bean
+    @Primary
+    public RegisteredClientRepository registeredClientRepositoryJDBC(JdbcTemplate jdbcTemplate) {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                //username
+                .clientId("client")
+                //password
+                .clientSecret("secret")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://127.0.0.1:3000/authorized")
+                .scope(OidcScopes.OPENID)
+                .clientSettings(ClientSettings.builder()
+                        .requireAuthorizationConsent(true)
+                        //now need PKCE
+                        //ako ne kazemo requireProof mozemo i sa pkc da radimo a mozemo i bez,fora je sto kada imamo pkc
+                        // ne moramo client secrete da saljemo sto je vise secure
 //
 //                  .requireProofKey(true)
-                .build())
-        .tokenSettings(TokenSettings.builder()
-            .refreshTokenTimeToLive(Duration.ofHours(10))
-            .build())
-        .build();
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .refreshTokenTimeToLive(Duration.ofHours(10))
+                        .build())
+                .build();
 
 //
 //    return new InMemoryRegisteredClientRepository(registeredClient);
@@ -98,6 +189,8 @@ public class AuthorizationServerConfig {
     jdbcRegisteredClientRepository.save(registeredClient);
     return jdbcRegisteredClientRepository;
   }
+        return jpaCustomRegistgeredClientRepository;
+    }
 
 
   //define endpoints for oid and oauth2 endpoints,default now
